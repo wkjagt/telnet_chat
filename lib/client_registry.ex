@@ -1,4 +1,4 @@
-defmodule TelnetChat.ClientRegistry do
+defmodule ClientRegistry do
   use GenServer
 
   ## Client API

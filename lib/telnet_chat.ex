@@ -26,7 +26,7 @@ defmodule TelnetChat do
     {:ok, pid} = Task.Supervisor.start_child(:client_connections, fn -> serve(client_socket) end)
     :ok = :gen_tcp.controlling_process(client_socket, pid)
 
-    TelnetChat.ClientRegistry.add_client(pid, client_socket)
+    ClientRegistry.add_client(pid, client_socket)
   end
 
   defp serve(client_socket) do
@@ -45,6 +45,6 @@ defmodule TelnetChat do
   end
 
   defp broadcast(line) do
-    TelnetChat.ClientRegistry.broadcast(line)
+    ClientRegistry.broadcast(line)
   end
 end
