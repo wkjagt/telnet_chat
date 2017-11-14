@@ -11,8 +11,8 @@ defmodule TelnetChat.ClientRegistry do
     GenServer.cast(server, {:add_client, client_pid, client_socket})
   end
 
-  def for_all_clients(server, callback) do
-    GenServer.cast(server, {:do, callback})
+  def broadcast(server, line) do
+    GenServer.cast(server, {:broadcast, line, self()})
   end
 
   ## Server Callbacks
@@ -21,8 +21,12 @@ defmodule TelnetChat.ClientRegistry do
     {:ok, %{}}
   end
 
-  def handle_cast({:do, callback}, clients) do
-    Enum.each clients, fn {_pid, client_socket} -> callback.(client_socket) end
+  def handle_cast({:broadcast, line, exclude_pid}, clients) do
+    Enum.each clients, fn {pid, client_socket} ->
+      unless exclude_pid == pid do
+        :gen_tcp.send(client_socket, line)
+      end
+    end
     {:noreply, clients}
   end
 

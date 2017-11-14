@@ -30,13 +30,7 @@ defmodule TelnetChat do
   end
 
   defp serve(client_socket) do
-    line = read_line(client_socket)
-
-    TelnetChat.ClientRegistry.for_all_clients TelnetChat.ClientRegistry, fn other_client_socket ->
-      unless other_client_socket == client_socket do
-        write_line(line, other_client_socket)
-      end
-    end
+    read_line(client_socket) |> broadcast
 
     serve(client_socket)
   end
@@ -45,16 +39,12 @@ defmodule TelnetChat do
     case :gen_tcp.recv(client_socket, 0) do
       {:ok, data} -> data
       {:error, :closed} ->
-        TelnetChat.ClientRegistry.for_all_clients TelnetChat.ClientRegistry, fn other_client_socket ->
-          unless other_client_socket == client_socket do
-            write_line("Someone went offline", other_client_socket)
-          end
-        end
+        broadcast("Someone went offline\n")
         Process.exit(self(), :normal)
     end
   end
 
-  defp write_line(line, client_socket) do
-    :gen_tcp.send(client_socket, line)
+  defp broadcast(line) do
+    TelnetChat.ClientRegistry.broadcast(TelnetChat.ClientRegistry, line)
   end
 end
