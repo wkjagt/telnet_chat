@@ -31,10 +31,6 @@ defmodule TelnetChat.ClientRegistry do
   end
 
   def handle_cast({:add_client, client_pid, client_socket}, clients) do
-    if Map.has_key?(clients, client_pid) do
-      {:noreply, clients}
-    else
-      {:noreply, Map.put(clients, client_pid, client_socket)}
-    end
+    {:noreply, Map.put(clients, client_pid, client_socket)}
   end
 end
