@@ -23,7 +23,7 @@ defmodule TelnetChat do
 
   defp accept_client(socket) do
     {:ok, client_socket} = :gen_tcp.accept(socket)
-    {:ok, pid} = Task.Supervisor.start_child(TelnetChat.TaskSupervisor, fn -> serve(client_socket) end)
+    {:ok, pid} = Task.Supervisor.start_child(:client_connections, fn -> serve(client_socket) end)
     :ok = :gen_tcp.controlling_process(client_socket, pid)
 
     TelnetChat.ClientRegistry.add_client(pid, client_socket)
