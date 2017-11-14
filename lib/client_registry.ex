@@ -7,12 +7,12 @@ defmodule TelnetChat.ClientRegistry do
     GenServer.start_link(__MODULE__, :ok, opts)
   end
 
-  def add_client(server, client_pid, client_socket) do
-    GenServer.cast(server, {:add_client, client_pid, client_socket})
+  def add_client(client_pid, client_socket) do
+    GenServer.cast(:client_registry, {:add_client, client_pid, client_socket})
   end
 
-  def broadcast(server, line) do
-    GenServer.cast(server, {:broadcast, line, self()})
+  def broadcast(line) do
+    GenServer.cast(:client_registry, {:broadcast, line, self()})
   end
 
   ## Server Callbacks
