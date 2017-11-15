@@ -1,4 +1,6 @@
-defmodule ClientRegistry do
+require IEx
+
+defmodule TelnetChat.ClientRegistry do
   use GenServer
 
   ## Client API
@@ -7,8 +9,8 @@ defmodule ClientRegistry do
     GenServer.start_link(__MODULE__, :ok, opts)
   end
 
-  def add_client(client_pid, client_socket) do
-    GenServer.cast(:client_registry, {:add_client, client_pid, client_socket})
+  def register_client(client_pid, client_socket) do
+    GenServer.cast(:client_registry, {:register_client, client_pid, client_socket})
   end
 
   def broadcast(line) do
@@ -30,7 +32,8 @@ defmodule ClientRegistry do
     {:noreply, clients}
   end
 
-  def handle_cast({:add_client, client_pid, client_socket}, clients) do
+  def handle_cast({:register_client, client_pid, client_socket}, clients) do
+    :gen_tcp.send(client_socket, "Welcome \n")
     {:noreply, Map.put(clients, client_pid, client_socket)}
   end
 end

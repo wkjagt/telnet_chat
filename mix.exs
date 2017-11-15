@@ -15,7 +15,7 @@ defmodule TelnetChat.Mixfile do
   def application do
     [
       extra_applications: [:logger],
-      mod: {TelnetChat.Application, []}
+      mod: {TelnetChat, []}
     ]
   end
 
