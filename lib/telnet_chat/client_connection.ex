@@ -25,12 +25,12 @@ defmodule TelnetChat.ClientConnection do
   end
 
   def handle_info({:write, line}, client) do
-    :gen_tcp.send(client.socket, line)
+    TelnetChat.Client.write(client, line)
     {:noreply, client}
   end
 
   def handle_info({:tcp_closed, _}, client) do
-
+    TelnetChat.ClientRegistry.unregister_client(client)
     {:noreply, client}
   end
 

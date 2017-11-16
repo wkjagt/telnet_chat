@@ -13,6 +13,10 @@ defmodule TelnetChat.ClientRegistry do
     GenServer.cast(:client_registry, {:register_client, client})
   end
 
+  def unregister_client(client) do
+    GenServer.cast(:client_registry, {:unregister_client, client})
+  end
+
   def broadcast(line) do
     GenServer.cast(:client_registry, {:broadcast, line, self()})
   end
@@ -35,5 +39,9 @@ defmodule TelnetChat.ClientRegistry do
   def handle_cast({:register_client, client}, client_pids) do
     send(client.pid, {:write, "Welcome \n"})
     {:noreply, MapSet.put(client_pids, client.pid)}
+  end
+
+  def handle_cast({:unregister_client, client}, client_pids) do
+    {:noreply, MapSet.delete(client_pids, client.pid)}
   end
 end
