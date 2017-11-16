@@ -1,4 +1,6 @@
-defmodule TelnetChat.Acceptor do
+require IEx
+
+defmodule TelnetChat.ClientConnection do
   use GenServer
 
   def start_link(listen_socket) do
@@ -12,8 +14,13 @@ defmodule TelnetChat.Acceptor do
     {:ok, %{client_socket: client_socket}}
   end
 
-  def handle_info({:tcp, client_socket, packet}, state) do
-    TelnetChat.ClientRegistry.broadcast(packet)
+  def handle_info({:tcp, _client_socket, line}, state) do
+    TelnetChat.ClientRegistry.broadcast(line)
+    {:noreply, state}
+  end
+
+  def handle_info({:write, line}, state) do
+    :gen_tcp.send(state[:client_socket], line)
     {:noreply, state}
   end
 

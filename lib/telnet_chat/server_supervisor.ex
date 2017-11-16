@@ -22,7 +22,7 @@ defmodule TelnetChat.ServerSupervisor do
     ]
 
     children = Enum.map 1..pool_size, fn counter ->
-      worker(TelnetChat.Acceptor, [listen_socket], [id: counter])
+      worker(TelnetChat.ClientConnection, [listen_socket], [id: counter])
     end
 
     supervise(children, opts)

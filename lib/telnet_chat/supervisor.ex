@@ -8,7 +8,6 @@ defmodule TelnetChat.Supervisor do
   def init(server_config = [_, _, _]) do
     children = [
       supervisor(TelnetChat.ClientRegistry, [[name: :client_registry]]),
-      supervisor(Task.Supervisor, [[name: TelnetChat.ClientsSupervisor]]),
       supervisor(TelnetChat.ServerSupervisor, server_config)
     ]
 

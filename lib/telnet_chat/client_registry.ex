@@ -24,9 +24,9 @@ defmodule TelnetChat.ClientRegistry do
   end
 
   def handle_cast({:broadcast, line, exclude_pid}, clients) do
-    Enum.each clients, fn {pid, client_socket} ->
-      unless exclude_pid == pid do
-        :gen_tcp.send(client_socket, line)
+    Enum.each clients, fn {client_pid, client_socket} ->
+      unless exclude_pid == client_pid do
+        send(client_pid, {:write, line})
       end
     end
     {:noreply, clients}
