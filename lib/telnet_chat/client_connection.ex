@@ -20,13 +20,11 @@ defmodule TelnetChat.ClientConnection do
   end
 
   def handle_info({:tcp, _, line}, client) do
-    TelnetChat.ClientRegistry.broadcast(line)
-    {:noreply, client}
+    {:noreply, TelnetChat.Client.receive(client, line)}
   end
 
-  def handle_info({:write, line}, client) do
-    TelnetChat.Client.write(client, line)
-    {:noreply, client}
+  def handle_info({:write, sender, line}, client) do
+    {:noreply, TelnetChat.Client.write(client, sender, line)}
   end
 
   def handle_info({:tcp_closed, _}, client) do
@@ -34,8 +32,7 @@ defmodule TelnetChat.ClientConnection do
     {:noreply, client}
   end
 
-  def handle_info({:tcp_error, _, reason}, client) do
-    IO.inspect reason
+  def handle_info({:tcp_error, _, _}, client) do
     {:noreply, client}
   end
 end
