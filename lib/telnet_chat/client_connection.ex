@@ -9,28 +9,33 @@ defmodule TelnetChat.ClientConnection do
 
   def init([listen_socket]) do
     {:ok, client_socket} = :gen_tcp.accept(listen_socket)
-    TelnetChat.ClientRegistry.register_client(self())
 
-    {:ok, %{client_socket: client_socket}}
+    client = %TelnetChat.Client{
+      pid: self(),
+      socket: client_socket
+    }
+    TelnetChat.ClientRegistry.register_client(client)
+
+    {:ok, client}
   end
 
-  def handle_info({:tcp, _, line}, client_info) do
+  def handle_info({:tcp, _, line}, client) do
     TelnetChat.ClientRegistry.broadcast(line)
-    {:noreply, client_info}
+    {:noreply, client}
   end
 
-  def handle_info({:write, line}, client_info) do
-    :gen_tcp.send(client_info[:client_socket], line)
-    {:noreply, client_info}
+  def handle_info({:write, line}, client) do
+    :gen_tcp.send(client.socket, line)
+    {:noreply, client}
   end
 
-  def handle_info({:tcp_closed, _}, client_info) do
-    IO.inspect "Socket has been closed"
-    {:noreply, client_info}
+  def handle_info({:tcp_closed, _}, client) do
+
+    {:noreply, client}
   end
 
-  def handle_info({:tcp_error, _, reason}, client_info) do
+  def handle_info({:tcp_error, _, reason}, client) do
     IO.inspect reason
-    {:noreply, client_info}
+    {:noreply, client}
   end
 end
